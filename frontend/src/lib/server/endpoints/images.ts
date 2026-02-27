@@ -58,6 +58,7 @@ export function makeImageProcessor<TMimeType extends string = string>(
 
 		const outputMime = chooseMimeType(supportedMimeTypes, preferredMimeType, mime, {
 			preferSizeReduction: tooLargeInBytes,
+			isBlockListedMime: isBlockListedMime(mime ,metadata.compression),
 		});
 
 		// Resize if necessary
@@ -104,10 +105,18 @@ export function convertImage(sharpInst: Sharp, outputMime: string): Sharp {
 }
 
 // heic/heif requires proprietary license
-// TODO: blocking heif may be incorrect considering it also supports av1, so we should instead
-// detect the compression method used via sharp().metadata().compression
+// Only block non av1 supports  
+const isBlockListedMime = (mime: string,compression?:string): boolean =>{
+	if(mime !== "image/heic" && mime !== "image/heif"){
+		return false;
+	}
+	if(!compression){
+		return false
+	}
+	return compression.toLowerCase() !== 'av1';
+
+}
 // TODO: consider what to do about animated formats: apng, gif, animated webp, ...
-const blocklistedMimes = ["image/heic", "image/heif"];
 
 /** Sorted from largest to smallest */
 const mimesBySizeDesc = [
@@ -127,7 +136,7 @@ function chooseMimeType<T extends readonly string[]>(
 	supportedMimes: T,
 	preferredMime: string,
 	mime: string,
-	{ preferSizeReduction }: { preferSizeReduction: boolean }
+	{ preferSizeReduction , isBlockListedMime }: { preferSizeReduction: boolean , isBlockListedMime:boolean }
 ): T[number] {
 	if (!supportedMimes.includes(preferredMime)) {
 		const supportedMimesStr = supportedMimes.join(", ");
@@ -141,7 +150,7 @@ function chooseMimeType<T extends readonly string[]>(
 
 	if (supportedMimes.includes(mime) && !preferSizeReduction) return mime;
 
-	if (blocklistedMimes.includes(mime)) throw Error(`Received blocklisted mime type: ${mime}`);
+	if (isBlockListedMime) throw Error(`Received blocklisted mime type: ${mime}`);
 
 	const smallestMime = mimesBySizeDesc.findLast((m) => supportedMimes.includes(m));
 	return smallestMime ?? preferredMime;
