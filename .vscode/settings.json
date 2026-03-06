@@ -12,5 +12,6 @@
         "Ripasudil",
         "Saptha",
         "Sapthami"
-    ]
+    ],
+    "python-envs.defaultEnvManager": "ms-python.python:system"
 }
