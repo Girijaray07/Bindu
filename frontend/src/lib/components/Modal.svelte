@@ -14,11 +14,13 @@
 		closeOnBackdrop?: boolean;
 		onclose?: () => void;
 		children?: import("svelte").Snippet;
+		ariaLabel?: string;
 	}
 
 	let {
 		width = "max-w-sm",
 		children,
+		ariaLabel = "Dialog",
 		closeButton = false,
 		disableFly = false,
 		closeOnBackdrop = true,
@@ -75,7 +77,7 @@
 			<div
 				role="dialog"
 				aria-modal="true"
-				aria-label="dialog"
+				aria-label={ariaLabel}
 				tabindex="-1"
 				bind:this={modalEl}
 				onkeydown={handleKeydown}
@@ -85,7 +87,7 @@
 				]}
 			>
 				{#if closeButton}
-					<button class="absolute right-4 top-4 z-50" aria-label="Close" onclick={() => onclose?.()}>
+					<button class="absolute right-4 top-4 z-50" aria-label="Close dialog" onclick={() => onclose?.()}>
   						<CarbonClose class="size-6 text-gray-700 dark:text-gray-300" />
 					</button>
 				{/if}
@@ -95,10 +97,9 @@
 			<div
 				role="dialog"
 				aria-modal="true"
-				aria-label="Settings"
+				aria-label={ariaLabel}
 				tabindex="-1"
 				bind:this={modalEl}
-				onkeydown={handleKeydown}
 				onkeydown={handleKeydown}
 				in:fly={{ y: 100 }}
 				class={[
@@ -107,7 +108,7 @@
 				]}
 			>
 				{#if closeButton}
-					<button class="absolute right-4 top-4 z-50" aria-label="Close" onclick={() => onclose?.()}>
+					<button class="absolute right-4 top-4 z-50" aria-label="Close dialog" onclick={() => onclose?.()}>
   						<CarbonClose class="size-6 text-gray-700 dark:text-gray-300" />
 					</button>
 				{/if}
